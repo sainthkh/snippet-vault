@@ -36,8 +36,8 @@ target_link_libraries(SnippetVault SnippetVaultLib)
 ###################################
 
 add_executable(SnippetVaultTest
-  test/main.c
-  test/add.test.c
+  src/main.test.c
+  src/add.test.c
 )
 
 target_include_directories(SnippetVaultTest PRIVATE src)
