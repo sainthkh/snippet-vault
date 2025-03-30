@@ -14,6 +14,32 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Utest)
 
+FetchContent_Declare(
+    SDL
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL
+    GIT_TAG release-3.2.8
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_Declare(
+    SDL_image
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
+    GIT_TAG release-3.2.4
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_Declare(
+    SDL_ttf
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf
+    GIT_TAG release-3.2.0
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(SDL SDL_image SDL_ttf)
+
 add_library(SnippetVaultLib
   src/add.c
 )
@@ -28,7 +54,23 @@ add_executable(SnippetVault
 )
 
 target_link_libraries(SnippetVault SnippetVaultLib)
+target_link_libraries(SnippetVault SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
 
+add_custom_command(TARGET SnippetVault POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SnippetVault> ${CMAKE_BINARY_DIR}
+)
+
+# Copy SDL dlls to build root
+# TODO: find better way to do this
+add_custom_command(TARGET SnippetVault POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/_deps/sdl-build/SDL3.dll ${CMAKE_BINARY_DIR}
+)
+add_custom_command(TARGET SnippetVault POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/_deps/sdl_image-build/SDL3_image.dll ${CMAKE_BINARY_DIR}
+)
+add_custom_command(TARGET SnippetVault POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/_deps/sdl_ttf-build/SDL3_ttf.dll ${CMAKE_BINARY_DIR}
+)
 
 #
 # SnippetVaultTest
@@ -43,4 +85,3 @@ add_executable(SnippetVaultTest
 target_include_directories(SnippetVaultTest PRIVATE src)
 target_link_libraries(SnippetVaultTest SnippetVaultLib Utest)
 add_test(NAME SnippetVaultTest COMMAND SnippetVaultTest)
-

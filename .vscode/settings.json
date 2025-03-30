@@ -1,0 +1,9 @@
+{
+    "cmake.generator": "Ninja",
+    "cmake.debugConfig": {
+        "cwd": "${workspaceRoot}",
+    },
+    "cmake.configureArgs": [
+        "-DSDLTTF_VENDORED=TRUE"
+    ]
+}
