@@ -4,6 +4,11 @@ project(SnippetVault VERSION 1.0)
 
 include(FetchContent)
 
+#
+# Fetch Contents
+#
+############################################
+
 FetchContent_Declare(
     Utest
     GIT_REPOSITORY https://github.com/sainthkh/utest.h.git
@@ -40,6 +45,21 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SDL SDL_image SDL_ttf)
 
+FetchContent_Declare(
+    quickjs
+    GIT_REPOSITORY https://github.com/quickjs-ng/quickjs.git
+    GIT_TAG v0.9.0
+    GIT_PROGRESS TRUE
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(quickjs)
+
+#
+# SnippetVaultLib
+#
+#################################
+
 add_library(SnippetVaultLib
   src/add.c
 )
@@ -50,11 +70,17 @@ add_library(SnippetVaultLib
 ##################################
 
 add_executable(SnippetVault
+  src/js.c
   src/main.c
+)
+
+target_include_directories(SnippetVault PRIVATE
+    build/_deps/quickjs-src
 )
 
 target_link_libraries(SnippetVault SnippetVaultLib)
 target_link_libraries(SnippetVault SDL3::SDL3 SDL3_image::SDL3_image SDL3_ttf::SDL3_ttf)
+target_link_libraries(SnippetVault qjs)
 
 add_custom_command(TARGET SnippetVault POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:SnippetVault> ${CMAKE_BINARY_DIR}
@@ -70,6 +96,9 @@ add_custom_command(TARGET SnippetVault POST_BUILD
 )
 add_custom_command(TARGET SnippetVault POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/_deps/sdl_ttf-build/SDL3_ttf.dll ${CMAKE_BINARY_DIR}
+)
+add_custom_command(TARGET SnippetVault POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/_deps/quickjs-build/libqjs.dll ${CMAKE_BINARY_DIR}
 )
 
 #

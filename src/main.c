@@ -8,6 +8,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1 /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include "js.h"
 
 #define SNAKE_BLOCK_SIZE_IN_PIXELS 24
 #define SDL_WINDOW_WIDTH (SNAKE_BLOCK_SIZE_IN_PIXELS * SNAKE_GAME_WIDTH)
@@ -97,6 +98,10 @@ static const struct
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+    js_init();
+
+    qjs_dofile_module(J, "js/load.js");
+
     size_t i;
 
     if (!SDL_SetAppMetadata("Example Snake game", "1.0", "com.example.Snake"))
@@ -181,4 +186,6 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
         SDL_DestroyWindow(as->window);
         SDL_free(as);
     }
+
+    js_release();
 }
