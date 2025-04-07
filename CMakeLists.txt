@@ -62,6 +62,7 @@ FetchContent_MakeAvailable(quickjs)
 
 add_library(SnippetVaultLib
   src/add.c
+  src/stringstore.c
 )
 
 #
@@ -109,6 +110,7 @@ add_custom_command(TARGET SnippetVault POST_BUILD
 add_executable(SnippetVaultTest
   src/main.test.c
   src/add.test.c
+  src/stringstore.test.c
 )
 
 target_include_directories(SnippetVaultTest PRIVATE src)
