@@ -62,8 +62,15 @@ FetchContent_MakeAvailable(quickjs)
 
 add_library(SnippetVaultLib
   src/add.c
+  src/js.c
   src/stringstore.c
 )
+
+target_include_directories(SnippetVaultLib PRIVATE
+    build/_deps/quickjs-src
+)
+
+target_link_libraries(SnippetVaultLib qjs)
 
 #
 # SnippetVault
@@ -71,7 +78,7 @@ add_library(SnippetVaultLib
 ##################################
 
 add_executable(SnippetVault
-  src/js.c
+  src/api.c
   src/main.c
 )
 
@@ -110,6 +117,7 @@ add_custom_command(TARGET SnippetVault POST_BUILD
 add_executable(SnippetVaultTest
   src/main.test.c
   src/add.test.c
+  src/js.test.c
   src/stringstore.test.c
 )
 

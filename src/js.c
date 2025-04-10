@@ -188,6 +188,177 @@ void qjs_dofile_module(JSContext *J, const char *filename)
     qjs_dofile_type(J, filename, JS_EVAL_TYPE_MODULE);
 }
 
+int qjs_getlength(JSContext *J, JSValue array)
+{
+    JSValue length = JS_GetPropertyStr(J, array, "length");
+    int len = JS_VALUE_GET_INT(length);
+    JS_FreeValue(J, length);
+
+    return len;
+}
+
+string_id qjs_addstring_idx(JSContext *J, JSValue array, int idx)
+{
+    JSValue prop = JS_GetPropertyUint32(J, array, idx);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property by index: %d\n", idx);
+        return -1;
+    }
+
+    const char *str = JS_ToCString(J, prop);
+    JS_FreeValue(J, prop);
+
+    string_id id = gss_add(str);
+    JS_FreeCString(J, str);
+
+    return id;
+}
+
+int qjs_getint_idx(JSContext *J, JSValue array, int idx)
+{
+    JSValue prop = JS_GetPropertyUint32(J, array, idx);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property by index: %d\n", idx);
+        return -1;
+    }
+
+    int value = JS_VALUE_GET_INT(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+float qjs_getfloat_idx(JSContext *J, JSValue array, int idx)
+{
+    JSValue prop = JS_GetPropertyUint32(J, array, idx);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property by index: %d\n", idx);
+        return -1;
+    }
+
+    double value = JS_VALUE_GET_FLOAT64(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+double qjs_getnumber_idx(JSContext *J, JSValue array, int idx)
+{
+    JSValue prop = JS_GetPropertyUint32(J, array, idx);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property by index: %d\n", idx);
+        return -1;
+    }
+
+    double value = prop.tag == JS_TAG_INT ? JS_VALUE_GET_INT(prop) : JS_VALUE_GET_FLOAT64(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+string_id qjs_addstring(JSContext *J, JSValue obj, const char *propName)
+{
+    JSValue prop = JS_GetPropertyStr(J, obj, propName);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property: %s\n", propName);
+        return -1;
+    }
+
+    const char *str = JS_ToCString(J, prop);
+    JS_FreeValue(J, prop);
+
+    string_id id = gss_add(str);
+    JS_FreeCString(J, str);
+
+    return id;
+}
+
+int qjs_getint(JSContext *J, JSValue obj, const char *propName)
+{
+    JSValue prop = JS_GetPropertyStr(J, obj, propName);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property: %s\n", propName);
+        return -1;
+    }
+
+    int value = JS_VALUE_GET_INT(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+float qjs_getfloat(JSContext *J, JSValue obj, const char *propName)
+{
+    JSValue prop = JS_GetPropertyStr(J, obj, propName);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property: %s\n", propName);
+        return -1;
+    }
+
+    double value = JS_VALUE_GET_FLOAT64(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+double qjs_getnumber(JSContext *J, JSValue obj, const char *propName)
+{
+    JSValue prop = JS_GetPropertyStr(J, obj, propName);
+    if (JS_IsException(prop))
+    {
+        fprintf(stderr, "Error getting property: %s\n", propName);
+        return -1;
+    }
+
+    double value = prop.tag == JS_TAG_INT ? JS_VALUE_GET_INT(prop) : JS_VALUE_GET_FLOAT64(prop);
+    JS_FreeValue(J, prop);
+
+    return value;
+}
+
+void qjs_setint(JSContext *J, JSValue obj, const char *propName, int value)
+{
+    JSValue prop = JS_NewInt32(J, value);
+    JS_SetPropertyStr(J, obj, propName, prop);
+}
+
+void qjs_setfloat(JSContext *J, JSValue obj, const char *propName, double value)
+{
+    JSValue prop = JS_NewFloat64(J, value);
+    JS_SetPropertyStr(J, obj, propName, prop);
+}
+
+void qjs_setstring(JSContext *J, JSValue obj, const char *propName, const char *value)
+{
+    JSValue prop = JS_NewString(J, value);
+    JS_SetPropertyStr(J, obj, propName, prop);
+}
+
+void qjs_setint_array(JSContext *J, JSValue array, int idx, int value)
+{
+    JSValue val = JS_NewInt32(J, value);
+    JS_SetPropertyUint32(J, array, idx, val);
+}
+
+void qjs_setfloat_array(JSContext *J, JSValue array, int idx, double value)
+{
+    JSValue val = JS_NewFloat64(J, value);
+    JS_SetPropertyUint32(J, array, idx, val);
+}
+
+void qjs_setstring_array(JSContext *J, JSValue array, int idx, const char *value)
+{
+    JSValue val = JS_NewString(J, value);
+    JS_SetPropertyUint32(J, array, idx, val);
+}
+
 void qjs_internal_free_values(JSContext *J, JSValue *values, int count)
 {
     for (int i = 0; i < count; i++)
