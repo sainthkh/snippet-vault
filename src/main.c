@@ -8,7 +8,9 @@
 #define SDL_MAIN_USE_CALLBACKS 1 /* use the callbacks instead of main() */
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include "stringstore.h"
 #include "js.h"
+#include "api.h"
 
 #define SNAKE_BLOCK_SIZE_IN_PIXELS 24
 #define SDL_WINDOW_WIDTH (SNAKE_BLOCK_SIZE_IN_PIXELS * SNAKE_GAME_WIDTH)
@@ -85,33 +87,39 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     return SDL_APP_CONTINUE;
 }
 
-static const struct
-{
-    const char *key;
-    const char *value;
-} extended_metadata[] =
-    {
-        {SDL_PROP_APP_METADATA_URL_STRING, "https://examples.libsdl.org/SDL3/demo/01-snake/"},
-        {SDL_PROP_APP_METADATA_CREATOR_STRING, "SDL team"},
-        {SDL_PROP_APP_METADATA_COPYRIGHT_STRING, "Placed in the public domain"},
-        {SDL_PROP_APP_METADATA_TYPE_STRING, "game"}};
-
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
+    gss_init();
     js_init();
+    api_init();
 
     qjs_dofile_module(J, "js/load.js");
 
     size_t i;
 
-    if (!SDL_SetAppMetadata("Example Snake game", "1.0", "com.example.Snake"))
+    if (!SDL_SetAppMetadata(gss_get(app_metadata.appname), gss_get(app_metadata.appversion), gss_get(app_metadata.appid)))
     {
+        SDL_Log("Couldn't set app metadata: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    for (i = 0; i < SDL_arraysize(extended_metadata); i++)
+    const char *metakeys[] = {
+        SDL_PROP_APP_METADATA_URL_STRING,
+        SDL_PROP_APP_METADATA_CREATOR_STRING,
+        SDL_PROP_APP_METADATA_COPYRIGHT_STRING,
+        SDL_PROP_APP_METADATA_TYPE_STRING,
+    };
+
+    const char *metavalues[] = {
+        gss_get(app_metadata_props.url),
+        gss_get(app_metadata_props.creator),
+        gss_get(app_metadata_props.copyright),
+        gss_get(app_metadata_props.type),
+    };
+
+    for (i = 0; i < SDL_arraysize(metakeys); i++)
     {
-        if (!SDL_SetAppMetadataProperty(extended_metadata[i].key, extended_metadata[i].value))
+        if (!SDL_SetAppMetadataProperty(metakeys[i], metavalues[i]))
         {
             return SDL_APP_FAILURE;
         }
@@ -131,7 +139,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     *appstate = as;
 
-    if (!SDL_CreateWindowAndRenderer("examples/demo/snake", SDL_WINDOW_WIDTH, SDL_WINDOW_HEIGHT, 0, &as->window, &as->renderer))
+    if (!SDL_CreateWindowAndRenderer(gss_get(app_window.name), app_window.width, app_window.height, 0, &as->window, &as->renderer))
     {
         return SDL_APP_FAILURE;
     }
@@ -187,5 +195,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
         SDL_free(as);
     }
 
+    api_release();
     js_release();
+    gss_release();
 }

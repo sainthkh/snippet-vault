@@ -19,15 +19,8 @@ void js_init()
 
     JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
 
-    JSValue global = JS_GetGlobalObject(J);
-
-    JSValue print = JS_NewCFunction(J, js_print, "print", 1);
-    JS_SetPropertyStr(J, global, "print", print);
-
-    JSValue temp_mainFn = JS_NewCFunction(J, set_main_func, "setMain", 1);
-    JS_SetPropertyStr(J, global, "setMain", temp_mainFn);
-
-    JS_FreeValue(J, global);
+    qjs_setfunc_global(J, "print", js_print, 1);
+    qjs_setfunc_global(J, "setMain", set_main_func, 1);
 }
 
 static JSModuleDef *js_module_loader(JSContext *ctx, const char *module_name, void *opaque)
@@ -339,6 +332,19 @@ void qjs_setstring(JSContext *J, JSValue obj, const char *propName, const char *
 {
     JSValue prop = JS_NewString(J, value);
     JS_SetPropertyStr(J, obj, propName, prop);
+}
+
+void qjs_setfunc(JSContext *J, JSValue obj, const char *propName, JSCFunction *func, int length)
+{
+    JSValue prop = JS_NewCFunction(J, func, propName, length);
+    JS_SetPropertyStr(J, obj, propName, prop);
+}
+
+void qjs_setfunc_global(JSContext *J, const char *propName, JSCFunction *func, int length)
+{
+    JSValue global = JS_GetGlobalObject(J);
+    qjs_setfunc(J, global, propName, func, length);
+    JS_FreeValue(J, global);
 }
 
 void qjs_setint_array(JSContext *J, JSValue array, int idx, int value)

@@ -24,6 +24,8 @@ double qjs_getnumber(JSContext *J, JSValue obj, const char *propName);
 void qjs_setint(JSContext *J, JSValue obj, const char *propName, int value);
 void qjs_setfloat(JSContext *J, JSValue obj, const char *propName, double value);
 void qjs_setstring(JSContext *J, JSValue obj, const char *propName, const char *value);
+void qjs_setfunc(JSContext *J, JSValue obj, const char *propName, JSCFunction *func, int length);
+void qjs_setfunc_global(JSContext *J, const char *propName, JSCFunction *func, int length);
 void qjs_setint_array(JSContext *J, JSValue array, int idx, int value);
 void qjs_setfloat_array(JSContext *J, JSValue array, int idx, double value);
 void qjs_setstring_array(JSContext *J, JSValue array, int idx, const char *value);
