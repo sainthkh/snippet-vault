@@ -79,6 +79,7 @@ target_link_libraries(SnippetVaultLib qjs)
 
 add_executable(SnippetVault
   src/api.c
+  src/scene.c
   src/main.c
 )
 

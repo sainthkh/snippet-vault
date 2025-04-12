@@ -11,6 +11,7 @@
 #include "stringstore.h"
 #include "js.h"
 #include "api.h"
+#include "scene.h"
 
 #define SNAKE_BLOCK_SIZE_IN_PIXELS 24
 #define SDL_WINDOW_WIDTH (SNAKE_BLOCK_SIZE_IN_PIXELS * SNAKE_GAME_WIDTH)
@@ -80,8 +81,13 @@ static SDL_AppResult handle_hat_event_(Context *ctx, Uint8 hat)
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     AppState *as = (AppState *)appstate;
+
+    scene_update();
+
     SDL_SetRenderDrawColor(as->renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(as->renderer);
+
+    scene_render();
 
     SDL_RenderPresent(as->renderer);
     return SDL_APP_CONTINUE;
@@ -92,8 +98,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     gss_init();
     js_init();
     api_init();
+    scene_init();
 
     qjs_dofile_module(J, "js/load.js");
+
+    scene_change(0);
 
     size_t i;
 
@@ -195,6 +204,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
         SDL_free(as);
     }
 
+    scene_release();
     api_release();
     js_release();
     gss_release();

@@ -1,6 +1,7 @@
 #include "api.h"
 
 #include "js.h"
+#include "scene.h"
 
 AppWindow app_window;
 AppMetadata app_metadata;
@@ -11,10 +12,13 @@ static JSValue js_appinit(JSContext *J, JSValue this_val, int argc, JSValue *arg
 void api_init()
 {
     qjs_setfunc_global(J, "api_appInit", js_appinit, 2);
+
+    scene_api_init();
 }
 
 void api_release()
 {
+    scene_api_release();
 }
 
 static JSValue js_appinit(JSContext *J, JSValue this_val, int argc, JSValue *argv)

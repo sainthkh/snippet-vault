@@ -12,3 +12,15 @@ api_appInit({
   copyright: "MIT LICENSE",
   type: "game",
 })
+
+api_addScene({
+  init: () => {
+    print("init");
+  },
+  update: () => {
+  },
+  render: () => {
+  },
+  release: () => {
+  },
+})

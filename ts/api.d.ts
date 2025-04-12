@@ -1,3 +1,5 @@
+declare function print(str: string): void;
+
 type AppWindow = {
   name: string;
   width: number;
@@ -18,3 +20,15 @@ type AppMetaProps = {
 }
 
 declare function api_appInit(window: AppWindow, meta: AppMeta, metaProps: AppMetaProps): void;
+
+type Scene = {
+  init: () => void;
+  update: () => void;
+  render: () => void;
+  release: () => void;
+}
+
+type SceneId = number;
+
+declare function api_addScene(scene: Scene): SceneId;
+
